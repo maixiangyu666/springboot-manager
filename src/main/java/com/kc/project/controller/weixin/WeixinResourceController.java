@@ -1,4 +1,4 @@
-package com.kc.project.controller;
+package com.kc.project.controller.weixin;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kc.project.common.utils.DataResult;

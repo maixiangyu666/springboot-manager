@@ -1,4 +1,4 @@
-package com.kc.project.controller;
+package com.kc.project.controller.weixin;
 
 import com.kc.project.entity.ResourceTypeEntity;
 import com.kc.project.service.ResourceTypeService;
