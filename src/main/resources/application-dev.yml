@@ -8,9 +8,9 @@ spring:
       datasource:
         master:
           username: root
-          password: Mxy%13@14..wmr
+          password: 123456a
           driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://123.56.120.30:3306/company_project?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=GMT%2b8
+          url: jdbc:mysql://127.0.0.1:3306/company_project?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=GMT%2b8
         oracle:
           username: root
           password: 123456a
