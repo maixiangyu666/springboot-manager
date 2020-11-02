@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kc.project.mapper.SysServiceMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kc.project.entity.SysServiceEntity" id="sysServiceMap">
+        <result property="id" column="id"/>
+        <result property="createtime" column="createtime"/>
+        <result property="lastupdatetime" column="lastupdatetime"/>
+        <result property="serviceCode" column="service_code"/>
+        <result property="serviceName" column="service_name"/>
+        <result property="classQualifiedName" column="class_qualified_name"/>
+        <result property="state" column="state"/>
+        <result property="category" column="category"/>
+        <result property="project" column="project"/>
+    </resultMap>
+
+
+</mapper>

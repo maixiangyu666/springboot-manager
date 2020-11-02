@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>资源首页</title>
+    <meta name="viewport"  charset="UTF-8" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="/css/weui.css">
+    <link rel="stylesheet" href="/css/weuix.css">
+</head>
+<body ontouchstart>
+<form method="post" th:action="@{searchResource}" th:id="searchResource" >
+<div class="weui-search-bar" id="searchBar">
+    <div class="weui-search-bar__form" style="width: 5000%">
+        <div class="weui-search-bar__box">
+            <input type="search" class="weui-search-bar__input" name="resourcename" placeholder="搜索资源"/>
+        </div>
+    </div>
+    <div class="weui-search-bar__box">
+        <i class="weui-icon-search" onclick="scanResource()"></i>
+    </div>
+</div>
+</form>
+    <div class="weui-panel weui-panel_access">
+    <div class="weui-panel__hd gridtitile">资源分类</div>
+    <div class="weui-panel__bd">
+        <div class="weui-media-box weui-media-box_text">
+<div class="weui-grids" >
+    <a th:each="type:${types}" th:href="@{/weixin/toResource(resourceType=${type.resourceType})}" class="weui-grid js_grid" >
+        <div class="weui-grid__icon">
+            <img th:src="${type.imageUrl}" alt="">
+        </div>
+        <p class="weui-grid__label" th:text="${type.resourceTypeName}">
+        </p>
+    </a>
+</div>
+        </div>
+    </div>
+
+</div>
+
+<div class="weui-footer weui-footer_fixed-bottom">
+    <p class="weui-footer__links">
+        <a href="../index.html" class="weui-footer__link">@六十六号杂货铺</a>
+    </p>
+    <p class="weui-footer__text" th:style ="'color : blue;'">能不能关注一下下</p>
+</div>
+</body>
+<script rel="stylesheet" src="/js/zepto.min.js"></script>
+<script>
+function scanResource() {
+    $("#searchResource").submit();
+}
+
+</script>
+
+</html>

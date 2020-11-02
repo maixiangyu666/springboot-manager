@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="/layui/css/layui.css">
+  <link rel="stylesheet" href="/css/custom.form.css">
+</head>
+<body>
+<div class="panel panel-default operation" hidden>
+  <div class="panel-heading title"></div>
+<div class="layui-card-body">
+
+<form class="layui-form " action="" lay-filter="info" style="width: 700px;margin-top: 10px">
+      <input name="id" hidden/>
+    <input name="serviceId" hidden/>
+    <div class="layui-form-item">
+        <label class="layui-form-label">序号</label>
+        <div class="layui-input-block">
+            <input type="sort" name="sort" placeholder="请输入序号" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">参数名</label>
+      <div class="layui-input-block">
+        <input type="paramName" name="paramName" placeholder="请输入参数名" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+    <label class="layui-form-label">参数编码</label>
+        <div class="layui-input-block">
+            <input type="memo" name="memo" placeholder="请输入参数编码" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">默认值</label>
+        <div class="layui-input-block">
+            <input type="defaultValue" name="defaultValue" placeholder="请输入默认值" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否必填</label>
+        <div class="layui-input-block">
+            <input type="radio" name="required" value="0" title="选填" >
+            <input type="radio" name="required" value="1" title="必填" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">参数类型</label>
+        <div class="layui-input-block">
+            <input type="radio" name="paramtype" value="0" title="登录参数" >
+            <input type="radio" name="paramtype" value="1" title="查询参数" >
+            <input type="radio" name="paramtype" value="2" title="主表参数">
+            <input type="radio" name="paramtype" value="3" title="子表参数">
+        </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">计算表达式</label>
+      <div class="layui-input-block">
+        <input type="regex" name="regex" placeholder="请输入参数表达式" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">校验条件</label>
+      <div class="layui-input-block">
+        <input type="paramdesc" name="paramdesc" placeholder="请输入校验表达式" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">校验提示</label>
+      <div class="layui-input-block">
+        <input type="tips" name="tips" placeholder="请输入校验提示" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+
+   <div class="layui-form-item">
+      <label class="layui-form-label">描述</label>
+      <div class="layui-input-block">
+        <input type="expression" name="expression" placeholder="请输入备注" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+
+  <div class="layui-form-item">
+  <div class="layui-input-block">
+    <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">保存</button>
+    <button  class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
+  </div>
+</div>
+</form>
+
+</div>
+</div>
+
+<div class="table_div">
+  <div id="searchParam"  shiro:hasPermission="sysParam:list">
+    <div class="layui-form-item">
+      <div class="layui-input-inline">
+        <input type="text" id="key" class="layui-input"  autocomplete="off" placeholder="请输入">
+      </div>
+
+      <div class="layui-input-inline ">
+        <button class="layui-btn" onclick="search()"  id="search">查询</button>
+        <button class="layui-btn"   id="export">导出全部</button>
+          <div th:id="serviceid" th:text="${serviceid}" style="display: none"></div>
+      </div>
+    </div>
+
+  </div>
+  <table class="layui-table" id="showTable" lay-filter="showTable" ></table>
+</div>
+<script type="text/html" id="toolbar">
+  <div class="layui-btn-container">
+    <button class="layui-btn layui-btn-sm" lay-event="add"  shiro:hasPermission="sysParam:add">添加</button>
+    <button class="layui-btn layui-btn-sm" lay-event="batchDeleted" shiro:hasPermission="sysParam:delete">删除</button>
+  </div>
+</script>
+<script type="text/html" id="tool">
+  <a class="layui-btn layui-btn-xs" lay-event="edit" shiro:hasPermission="sysParam:update">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" shiro:hasPermission="sysParam:delete">删除</a>
+</script>
+
+</body>
+</html>
+<script src="/layui/layui.all.js"></script>
+<script src="/js/core.util.js"></script>
+<script >
+  //获取token
+  var token = CoreUtil.getData("access_token");
+  //地址栏转义token中的#号
+  var tokenQuery = token.replace("#", "%23");
+  var tableIns1;
+  var table = layui.table;
+  var form = layui.form;
+  var layer = layui.layer;
+  var $ = jQuery = layui.jquery;
+  var laydate = layui.laydate;
+  var serviceid=$("#serviceid").text();
+
+
+
+
+  layui.use(['table', 'layer', 'laydate'], function () {
+
+    //加载table
+    tableIns1 = table.render({
+      elem: '#showTable'
+      , contentType: 'application/json'
+      , headers: {"authorization": token}
+      , page: true //开启分页
+      , url: '/sysParam/listByPage?serviceid='+serviceid //数据接口
+      , method: 'POST'
+      , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+        return {
+          "code": res.code, //解析接口状态
+          "msg": res.msg, //解析提示文本
+          "count": CoreUtil.isEmpty(res.data) ? 0 : res.data.total, //解析数据长度
+          "data": CoreUtil.isEmpty(res.data) ? null : res.data.records //解析数据列表
+        }
+      }
+      , cols: [
+        [
+          {type: 'checkbox', fixed: 'left'},
+          {field: 'sort', title: '序号', sort: true},
+          {field: 'paramName', title: '参数编码', sort: true},
+          {field: 'memo', title: '参数名', sort: true},
+          {field: 'required', title: '是否必填', templet: function (item) {
+                    if (item.required == 0) {
+                        return '<a>选填</a>';
+                    }
+                    if (item.required == 1) {
+                        return '<a>必填</a>';
+                    }
+                }
+            },
+          {field: 'defaultValue', title: '默认值', sort: true},
+          {field: 'paramtype', title: '服务种类', templet: function (item) {
+                    if (item.paramtype == 0) {
+                        return '<a>登录参数</a>';
+                    }
+                    if (item.paramtype == 1) {
+                        return '<a>查询参数</a>';
+                    }
+                    if (item.paramtype == 2) {
+                        return '<a>主表参数</a>';
+                    }
+                    if (item.paramtype == 3) {
+                        return '<a>子表参数</a>';
+                    }
+                }
+            },
+          {field: 'regex', title: '计算表达式', sort: true},
+          {field: 'paramdesc', title: '校验条件', sort: true},
+          {field: 'tips', title: '校验提示', sort: true},
+          {field: 'expression', title: '备注', sort: true},
+          {width: 120, toolbar: "#tool", title: '操作'}
+        ]
+      ]
+      , toolbar: '#toolbar'
+    });
+
+
+    //表头工具
+    table.on('toolbar(showTable)', function(obj){
+      switch(obj.event){
+        case 'batchDeleted':
+          var checkStatus = table.checkStatus(obj.config.id);
+          var data = checkStatus.data;
+          if(data.length==0){
+            layer.msg("请选择要批量删除的列");
+          }else {
+            var ids = [];
+            $(data).each(function (index,item) {
+              ids.push(item.id);
+            });
+            tipDialog(ids);
+          }
+          break;
+        case 'add':
+          $(".table_div").hide();
+          $(".operation").show();
+          $(".title").html("新增");
+          $(".operation input[name=id]").val("");
+          $(".operation input[name=serviceId]").val(serviceid);
+          $(".operation input[name=sort]").val("");
+          $(".operation input[name=paramName]").val("");
+          $(".operation input[name=defaultValue]").val("");
+          $(".operation input[name=required]").val("");
+          $(".operation input[name=paramtype]").val("");
+          $(".operation input[name=regex]").val("");
+          $(".operation input[name=paramdesc]").val("");
+          $(".operation input[name=tips]").val("");
+          $(".operation input[name=memo]").val("");
+          $(".operation input[name=expression]").val("");
+          break;
+      };
+    });
+    //列操作
+    table.on('tool(showTable)',function (obj) {
+      var data = obj.data;
+      switch (obj.event) {
+        case 'del':
+          var ids=[];
+          ids.push(data.id);
+          tipDialog(ids);
+          break;
+        case 'edit':
+          $(".table_div").hide();
+          $(".operation").show();
+          $(".title").html("编辑");
+          $(".operation input[name=id]").val(data.id);
+          $(".operation input[name=serviceid]").val(data.serviceId);
+          $(".operation input[name=paramName]").val(data.paramName);
+          $(".operation input[name=defaultValue]").val(data.defaultValue);
+          $(".operation input[name=regex]").val(data.regex);
+          $(".operation input[name=paramdesc]").val(data.paramdesc);
+          $(".operation input[name=tips]").val(data.tips);
+          $(".operation input[name=memo]").val(data.memo);
+          $(".operation input[name=expression]").val(data.expression);
+          $(".operation input[name=sort]").val(data.sort);
+          $("input[type=radio][name=required][value='"+data.required+"']").attr("checked",true);
+          $("input[type=radio][name=paramtype][value='"+data.paramtype+"']").attr("checked",true);
+          break;
+      }
+    });
+
+    //导出
+    $('#export').on('click', function () {
+      //原先分页limit
+      var exportParams = {
+        limit: 10000,
+        key: $("#key").val()
+      };
+      CoreUtil.sendPost("/sysParam/listByPage", exportParams, function (res) {
+        //初始化渲染数据
+        if (res.data != null && res.data.records != null) {
+          table.exportFile(tableIns1.config.id, res.data.records, 'xls');
+        }
+      });
+    });
+
+    //删除
+    var tipDialog=function (ids) {
+      layer.open({
+        content: "确定要删除么?",
+        yes: function(index, layero){
+          layer.close(index); //如果设定了yes回调，需进行手工关闭
+          CoreUtil.sendDelete("/sysParam/delete",ids,function (res) {
+            layer.msg(res.msg, {time:1000},function () {
+              search();
+            });
+          });
+        }
+      });
+    };
+
+    //返回
+    $("#btn_cancel").click(function() {
+      $(".table_div").show();
+      $(".operation").hide();
+      return false;
+    });
+
+    //监听保存
+    form.on('submit(submit)', function(data){
+      if(data.field.id===undefined || data.field.id===null || data.field.id===""){
+        CoreUtil.sendPost("/sysParam/add",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          search();
+        });
+      }else {
+        CoreUtil.sendPut("/sysParam/update",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          search();
+        });
+      }
+
+      return false;
+    });
+  });
+
+  //执行查询
+  function search() {
+    //这里以搜索为例
+    tableIns1.reload({
+      where: { //设定异步数据接口的额外参数，任意设
+        key: $("#key").val()
+      }
+      , page: {
+        curr: 1 //重新从第 1 页开始
+      }
+    });
+  };
+</script>

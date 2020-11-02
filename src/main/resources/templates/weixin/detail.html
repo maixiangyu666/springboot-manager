@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Title</title>
+    <meta name="viewport"  charset="UTF-8" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="/css/weui.css">
+    <link rel="stylesheet" href="/css/weuix.css">
+</head>
+<style>
+.desc-self{
+    float: left;
+    white-space:pre-wrap;
+    overflow: hidden;
+    text-align: justify;
+    text-indent: 2em;
+    line-height:200%;
+    color: #999999;
+    word-wrap: break-word;
+    word-break: normal;
+}
+.english-self{
+    float: left;
+
+    overflow: hidden;
+    text-align: justify;
+    text-indent: 2em;
+    line-height:200%;
+    color: #999999;
+    word-wrap: break-word;
+    word-break:break-all;
+}
+
+    .title-pos{
+        margin-right: 90px;
+
+    }
+
+</style>
+<body ontouchstart>
+<div class="weui-cells__title ">
+<span class="celltitle">
+        资源详情
+</span>
+</div>
+<div class="clear"></div>
+<div class="weui-form-preview">
+    <!-- head 部分 -->
+    <div class="weui-form-preview__hd">
+        <div class="weui-form-preview__item">
+            <label class="weui-form-preview__label">资源名称:</label>
+            <input id="resourceId"  type="hidden" th:value="${resourceId}"/>
+            <p class="f-blue title-pos"  th:text="${resources.name}">资源名称</p>
+
+            <div class="weui-form-preview__item" >
+                <p class="weui-form-preview__label">资源简介:</p>
+                <div class="  desc-self   f13 " th:text="${resources.description}">这是一款可以编辑前端界面的应用软件，画风精美,可以让程序员快速开发</div>
+            </div>
+        </div>
+    </div>
+    <!-- body 部分 -->
+    <div class="weui-form-preview__bd">
+        <div class="weui-form-preview__item" th:each="platform : ${resources.platformEntitys}">
+            <p class="weui-form-preview__label" th:text="${platform.plattypename}"></p>
+            <div class="  english-self   f13 " th:text="${platform.platurl}"></div>
+        </div>
+    </div>
+    <!-- foot 部分 -->
+    <div class="weui-form-preview__ft">
+        <a id="good" onclick="addgood()" class="weui-form-preview__btn weui-form-preview__btn_primary" th:text="'点赞'+${resources.good}"></a>
+        <a id="bad" onclick="addbad()" class="weui-form-preview__btn weui-form-preview__btn_primary" th:text="'点踩'+${resources.bad}"></a>
+    </div>
+</div>
+</div>
+<div class="weui-footer weui-footer_fixed-bottom">
+    <p class="weui-footer__links">
+        <a href="../index.html" class="weui-footer__link">@六十六号杂货铺</a>
+    </p>
+    <p class="weui-footer__text">能不能关注一下下</p>
+</div>
+</body>
+<script rel="stylesheet" src="/js/zepto.min.js"></script>
+<script>
+$(function () {
+
+})
+
+
+
+ function addgood() {
+     var goodcount=$("#good").text().match(/\d+/);
+     var resourceId=$("#resourceId").val();
+     goodcount=parseInt(goodcount)+1;
+     $("#good").text('点赞'+goodcount)
+     $("#good").removeAttr("onclick")
+     $("#good").css("color","black")
+     $.ajax({
+         "type": "GET",
+         "url":"[[@{/weixin/addCount}]]",
+         "data":{
+             "good":goodcount,
+             "id" :resourceId
+         },
+         "async": false,
+         "error": function(request) {
+             alert("Connection error");
+         },
+         "success": function(data) {
+             var jsonData = eval("(" + data + ")");
+             if("ok" == jsonData.msg){
+                 flag = true;
+             }else {
+                 flag = false;
+             }
+         }
+     });
+}
+
+
+
+
+function addbad() {
+    var badcount=$("#bad").text().match(/\d+/);
+    badcount=parseInt(badcount)+1;
+    var resourceId=$("#resourceId").val();
+    $("#bad").text('点踩'+badcount)
+    $("#bad").removeAttr("onclick")
+    $("#bad").css("color","black")
+    $.ajax({
+        "type": "GET",
+        "url":"[[@{/weixin/addCount}]]",
+        "data":{
+            "bad":badcount,
+            "id" :resourceId
+        },
+        "async": false,
+        "error": function(request) {
+            alert("Connection error");
+        },
+        "success": function(data) {
+            var jsonData = eval("(" + data + ")");
+            if("ok" == jsonData.msg){
+                flag = true;
+            }else {
+                flag = false;
+            }
+        }
+    });
+}
+</script>
+</html>

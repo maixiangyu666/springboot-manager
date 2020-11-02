@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>资源列表</title>
+    <meta name="viewport"  charset="UTF-8" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="/css/weui.css">
+    <link rel="stylesheet" href="/css/weuix.css">
+</head>
+<style>
+
+
+</style>
+<body ontouchstart>
+<div class="weui-search-bar" id="searchBar">
+    <div class="weui-search-bar__form" style="width: 5000%">
+        <div class="weui-search-bar__box">
+            <input type="search" class="weui-search-bar__input" th:id="resourcename" name="resourcename" placeholder="搜索资源"/>
+        </div>
+    </div>
+    <div class="weui-search-bar__box">
+        <i class="weui-icon-search" onclick="scanResource()"></i>
+    </div>
+</div>
+<div class="weui-cells">
+        <a th:each="resource : ${resources}" th:resourcename="${resource.name}" class="weui-cell weui-cell_access" th:href="@{/weixin/toDetail(resourceId=${resource.id})}">
+            <div class="weui-cell__bd">
+                <p class="f12" th:text="${resource.name}"></p>
+            </div>
+            <div class="weui-cell__ft">
+                <p class="f12" th:text="${resource.platTypes}"></p>
+            </div>
+        </a>
+</div>
+
+<div class="weui-footer weui-footer_fixed-bottom">
+    <p class="weui-footer__links">
+        <a href="../index.html" class="weui-footer__link">@六十六号杂货铺</a>
+    </p>
+    <p class="weui-footer__text">能不能关注一下下</p>
+</div>
+</body>
+<script rel="stylesheet" src="/js/zepto.min.js"></script>
+<script>
+
+    function scanResource() {
+        var searchValue = $("#resourcename").val();
+        $(".weui-cells a").each(function(){
+            var resourcename = $(this).attr("resourcename");
+            if(resourcename.indexOf(searchValue) == -1){
+                $(this).hide();
+            }else {
+                $(this).show();
+            }
+        });
+    }
+
+
+
+</script>
+</html>

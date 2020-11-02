@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kc.project.mapper.MdmLogDetailMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kc.project.entity.MdmLogDetail" id="mdmLogDetailMap">
+        <result property="id" column="id"/>
+        <result property="createtime" column="createtime"/>
+        <result property="lastupdatetime" column="lastupdatetime"/>
+        <result property="pid" column="pid"/>
+        <result property="request" column="request"/>
+        <result property="response" column="response"/>
+        <result property="stime" column="stime"/>
+        <result property="etime" column="etime"/>
+        <result property="state" column="state"/>
+        <result property="serviceid" column="serviceid"/>
+    </resultMap>
+
+
+</mapper>

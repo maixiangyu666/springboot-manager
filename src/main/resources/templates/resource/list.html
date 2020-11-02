@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="/layui/css/layui.css">
+  <link rel="stylesheet" href="/css/custom.form.css">
+</head>
+<body>
+<div class="panel panel-default operation" hidden>
+  <div class="panel-heading title"></div>
+<div class="layui-card-body">
+<form class="layui-form " action="" lay-filter="info" style="width: 700px;margin-top: 10px">
+      <input name="id" hidden/>
+        <div class="layui-form-item">
+      <label class="layui-form-label">资源名</label>
+      <div class="layui-input-block">
+        <input type="name" name="name" placeholder="请输入资源名" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+        <div class="layui-form-item">
+      <label class="layui-form-label">资源描述</label>
+      <div class="layui-input-block">
+        <input type="description" name="description" placeholder="请输入资源描述" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">资源类型</label>
+        <div class="layui-input-inline">
+            <select id ="typeId" name="typeId" lay-filter="aihao">
+                <option th:each="type : ${types}" th:value="${type.resourceType}" th:text="${type.resourceTypeName}"></option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">点赞次数</label>
+        <div class="layui-input-block">
+            <input type="good" name="good" placeholder="请输入点赞次数" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">点踩次数</label>
+        <div class="layui-input-block">
+            <input type="bad" name="bad" placeholder="请输入点踩次数" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">启用状态</label>
+        <div class="layui-input-block">
+            <input type="checkbox" name="dr"  lay-skin="switch" lay-filter="switch" lay-text="启用|不启用" checked>
+        </div>
+    </div>
+  <div class="layui-form-item">
+  <div class="layui-input-block">
+    <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">保存</button>
+    <button  class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
+  </div>
+</div>
+</form>
+</div>
+</div>
+
+<div class="table_div">
+  <div id="searchParam"  shiro:hasPermission="resource:list">
+    <div class="layui-form-item">
+      <div class="layui-input-inline">
+        <input type="text" id="key" class="layui-input"  autocomplete="off" placeholder="请输入">
+      </div>
+
+      <div class="layui-input-inline ">
+        <button class="layui-btn" onclick="search()"  id="search">查询</button>
+        <button class="layui-btn"   id="export">导出全部</button>
+      </div>
+    </div>
+
+  </div>
+  <table class="layui-table" id="showTable" lay-filter="showTable" ></table>
+</div>
+<script type="text/html" id="toolbar">
+  <div class="layui-btn-container">
+    <button class="layui-btn layui-btn-sm" lay-event="add"  shiro:hasPermission="resource:add">添加</button>
+    <button class="layui-btn layui-btn-sm" lay-event="batchDeleted" shiro:hasPermission="resource:delete">删除</button>
+  </div>
+</script>
+<script type="text/html" id="tool">
+  <a class="layui-btn layui-btn-xs" lay-event="edit" shiro:hasPermission="resource:update">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" shiro:hasPermission="resource:delete">删除</a>
+  <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="param"  shiro:hasPermission="resource:param">资源明细</a>
+</script>
+
+</body>
+</html>
+<script src="/layui/layui.all.js"></script>
+<script src="/js/core.util.js"></script>
+<script>
+  //获取token
+  var token = CoreUtil.getData("access_token");
+  //地址栏转义token中的#号
+  var tokenQuery = token.replace("#", "%23");
+  var tableIns1;
+  var table = layui.table;
+  var form = layui.form;
+  var layer = layui.layer;
+  var $ = jQuery = layui.jquery;
+  var laydate = layui.laydate;
+
+  layui.use(['table', 'layer', 'laydate'], function () {
+
+    //加载table
+    tableIns1 = table.render({
+      elem: '#showTable'
+      , contentType: 'application/json'
+      , headers: {"authorization": token}
+      , page: true //开启分页
+      , url: '/resource/listByPage' //数据接口
+      , method: 'POST'
+      , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+        return {
+          "code": res.code, //解析接口状态
+          "msg": res.msg, //解析提示文本
+          "count": CoreUtil.isEmpty(res.data) ? 0 : res.data.total, //解析数据长度
+          "data": CoreUtil.isEmpty(res.data) ? null : res.data.records //解析数据列表
+        }
+      }
+      , cols: [
+        [
+          {type: 'checkbox', fixed: 'left'},
+          {field: 'name', title: '资源名', sort: true},
+          {field: 'description', title: '资源描述', sort: true},
+            {field: 'good', title: '点赞次数', sort: true},
+            {field: 'bad', title: '点踩次数', sort: true},
+            {field: 'typeName', title: '资源类型', sort: true},
+            {
+                field: 'dr', title: '启用状态',  templet: function (item) {
+                    if (item.dr == 1) {
+                        return '  <input type="checkbox" lay-skin="switch" lay-text="启用|禁用" checked disabled>';
+                    }
+                    if (item.dr == 0) {
+                        return '  <input type="checkbox" lay-skin="switch" lay-text="启用|禁用" disabled>';
+                    }
+                }
+            },
+          {width: 200, toolbar: "#tool", title: '操作'}
+        ]
+      ]
+      , toolbar: '#toolbar'
+    });
+
+
+    //表头工具
+    table.on('toolbar(showTable)', function(obj){
+      switch(obj.event){
+        case 'batchDeleted':
+          var checkStatus = table.checkStatus(obj.config.id);
+          var data = checkStatus.data;
+          if(data.length==0){
+            layer.msg("请选择要批量删除的列");
+          }else {
+            var ids = [];
+            $(data).each(function (index,item) {
+              ids.push(item.id);
+            });
+            tipDialog(ids);
+          }
+          break;
+        case 'add':
+          $(".table_div").hide();
+          $(".operation").show();
+          $(".title").html("新增");
+          $(".operation input[name=id]").val("");
+          $(".operation input[name=name]").val("");
+          $(".operation input[name=url]").val("");
+          $(".operation input[name=description]").val("");
+          $(".operation input[name=typeId]").val("");
+            $(".operation input[name=good]").val("");
+            $(".operation input[name=bad]").val("");
+            $(".operation input[name=dr]").attr('checked', 'checked');
+            $(".operation input[name=dr]").attr('type', 'hidden').val('1');
+            var x = document.getElementsByClassName("layui-unselect layui-form-switch");
+            x[0].setAttribute("class", "layui-unselect layui-form-switch layui-form-onswitch");
+            var d = document.getElementsByTagName('em')[0];
+            d.firstChild.nodeValue = '启用';
+
+          break;
+      };
+    });
+    //列操作
+    table.on('tool(showTable)',function (obj) {
+      var data = obj.data;
+      switch (obj.event) {
+        case 'del':
+          var ids=[];
+          ids.push(data.id);
+          tipDialog(ids);
+          break;
+        case 'edit':
+          $(".table_div").hide();
+          $(".operation").show();
+          $(".title").html("编辑");
+          $(".operation input[name=id]").val(data.id);
+          $(".operation input[name=name]").val(data.name);
+          $(".operation input[name=url]").val(data.url);
+          $(".operation input[name=description]").val(data.description);
+          $(".operation input[name=typeId]").val(data.typeId);
+            $(".operation input[name=good]").val(data.good);
+            $(".operation input[name=bad]").val(data.bad);
+            $(".operation input[name=dr]").val(data.dr);
+            if (data.dr == 1) {
+                $(".operation input[name=dr]").attr('checked', 'checked');
+                $(".operation input[name=dr]").attr('type', 'hidden').val(1);
+                var x = document.getElementsByClassName("layui-unselect layui-form-switch");
+                x[0].setAttribute("class", "layui-unselect layui-form-switch layui-form-onswitch");
+                var d = document.getElementsByTagName('em')[0];
+                d.firstChild.nodeValue = '启用';
+            } else {
+                $(".operation input[name=dr]").attr('type', 'hidden').removeAttr("checked").val(0);
+                var x = document.getElementsByClassName("layui-unselect layui-form-switch");
+                x[0].setAttribute("class", "layui-unselect layui-form-switch");
+                var d = document.getElementsByTagName('em')[0];
+                d.firstChild.nodeValue = '禁用';
+            }
+          case 'param' :
+              var href=$(".layui-btn.layui-btn-xs.layui-btn-normal");
+              href.attr('href',"/resource/param?authorization="+tokenQuery+"&resourceid="+data.id);
+            break;
+      }
+    });
+
+    //导出
+    $('#export').on('click', function () {
+      //原先分页limit
+      var exportParams = {
+        limit: 10000,
+        key: $("#key").val()
+      };
+      CoreUtil.sendPost("/resource/listByPage", exportParams, function (res) {
+        //初始化渲染数据
+        if (res.data != null && res.data.records != null) {
+          table.exportFile(tableIns1.config.id, res.data.records, 'xls');
+        }
+      });
+    });
+
+    //删除
+    var tipDialog=function (ids) {
+      layer.open({
+        content: "确定要删除么?",
+        yes: function(index, layero){
+          layer.close(index); //如果设定了yes回调，需进行手工关闭
+          CoreUtil.sendDelete("/resource/delete",ids,function (res) {
+            layer.msg(res.msg, {time:1000},function () {
+              search();
+            });
+          });
+        }
+      });
+    };
+
+    //返回
+    $("#btn_cancel").click(function() {
+      $(".table_div").show();
+      $(".operation").hide();
+      return false;
+    });
+      form.on('switch(switch)', function () {
+          $(".operation input[name=dr]").attr('type', 'hidden').val(this.checked ? '1' : '0');
+      });
+
+      //监听保存
+    form.on('submit(submit)', function(data){
+      if(data.field.id===undefined || data.field.id===null || data.field.id===""){
+        CoreUtil.sendPost("/resource/add",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          search();
+        });
+      }else {
+        CoreUtil.sendPut("/resource/update",data.field,function (res) {
+          $(".table_div").show();
+          $(".operation").hide();
+          search();
+        });
+      }
+
+      return false;
+    });
+  });
+
+  //执行查询
+  function search() {
+    //这里以搜索为例
+    tableIns1.reload({
+      where: { //设定异步数据接口的额外参数，任意设
+        key: $("#key").val()
+      }
+      , page: {
+        curr: 1 //重新从第 1 页开始
+      }
+    });
+  };
+</script>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kc.project.mapper.PlatformMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kc.project.entity.PlatformEntity" id="platformMap">
+        <result property="id" column="id"/>
+        <result property="resourceId" column="resource_id"/>
+        <result property="plattype" column="plattype"/>
+        <result property="plattypename" column="plattypename"/>
+        <result property="platurl" column="platurl"/>
+        <result property="dr" column="dr"/>
+        <result property="createtime" column="createtime"/>
+        <result property="lastupdatetime" column="lastupdatetime"/>
+    </resultMap>
+    <select id="listPlats" resultType="com.kc.project.entity.PlatformEntity">
+        select * from platform where resource_id=#{resourceid} and dr=1
+    </select>
+
+
+</mapper>

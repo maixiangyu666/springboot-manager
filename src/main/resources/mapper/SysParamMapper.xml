@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kc.project.mapper.SysParamMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kc.project.entity.SysParamEntity" id="sysParamMap">
+        <result property="id" column="id"/>
+        <result property="createtime" column="createtime"/>
+        <result property="lastupdatetime" column="lastupdatetime"/>
+        <result property="paramName" column="param_name"/>
+        <result property="serviceId" column="service_id"/>
+        <result property="required" column="required"/>
+        <result property="defaultValue" column="default_value"/>
+        <result property="paramtype" column="paramtype"/>
+        <result property="regex" column="regex"/>
+        <result property="paramdesc" column="paramdesc"/>
+        <result property="tips" column="tips"/>
+        <result property="memo" column="memo"/>
+        <result property="expression" column="expression"/>
+        <result property="sort" column="sort"/>
+    </resultMap>
+
+
+</mapper>
